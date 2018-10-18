@@ -6,42 +6,33 @@
  * Time: 10:32 PM
  */
 
+include_once "config.php";
 
-
-//API Url
-
-function callAPI($RTG, $method, $payload_JSON=null, $APIurl){
-
+function callAPI($method,  $APIurl, $payload_JSON=null){
+global $dcaFQDN;
     if (isset($_SESSION['LAST_ACTIVITY']) && isset($_SESSION['DCATOKEN'])){
         if ((time() - $_SESSION['LAST_ACTIVITY'] > 600)) {
-            session_unset();     // unset $_SESSION variable for the run-time
-            session_destroy();   // destroy session data in storage
-            $_SESSION['CREATED'] = time();
-            $_SESSION['DCATOKEN'] = file_get_contents('http://172.16.239.79/api.php');
+            session_unset();
+            session_destroy();
+            $_SESSION['LAST_ACTIVITY'] = time();
+            $_SESSION['DCATOKEN'] = file_get_contents('http://'.$_SERVER['SERVER_ADDR'].'/gettoken.php');
         }
-
-
     }else{
-        $_SESSION['CREATED'] = time();
-        $_SESSION['DCATOKEN'] = file_get_contents('http://172.16.239.79/api.php');
+        $_SESSION['LAST_ACTIVITY'] = time();
+        $_SESSION['DCATOKEN'] = file_get_contents('http://'.$_SERVER['SERVER_ADDR'].'/gettoken.php');
     }
 
 
-    //$tokenData = file_get_contents('http://172.16.239.79/api.php');
-    $tokenData = $_SESSION['DCATOKEN'];
-
-    $tdDecoded = json_decode($tokenData, 1);
+    $tdDecoded = json_decode($_SESSION['DCATOKEN'], 1);
     $token = $tdDecoded['token']['id'];
     $refresh_token = $tdDecoded['refreshToken'];
-    $baseURL = "https://demo-mast.dca.demo.local";
+    $baseURL = "https://". $dcaFQDN;
     $url = $baseURL . $APIurl;
     $ch = curl_init($url);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-
     switch ($method){
         case "GET":
-            //curl_setopt($ch, CURLOPT_GET, 1);
             curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-Auth-Token:'.$token));
             break;
         case "POST":
@@ -50,7 +41,6 @@ function callAPI($RTG, $method, $payload_JSON=null, $APIurl){
             curl_setopt($ch, CURLOPT_POSTFIELDS, $payload_JSON);
 
     }
-
     $result = curl_exec($ch);
     $data = json_decode($result, true);
     return $data;
@@ -58,7 +48,7 @@ function callAPI($RTG, $method, $payload_JSON=null, $APIurl){
 
 function getResourceGroups($uuid=null)
 {
-    $data = callAPI('RGP', 'GET', null, "/urest/v1/resource_group");
+    $data = callAPI('GET',  "/urest/v1/resource_group", null);
     if ($uuid !== null) {
         foreach ($data['members'] as $group) {
             if ($group['uuid'] == $uuid) {
@@ -71,7 +61,7 @@ function getResourceGroups($uuid=null)
     }
 }
 function getResourceGroupDetails($uuid){
-    $data = callAPI('RGP','GET', null,"/urest/v1/resource_group/".$uuid."?fields=PolicySubscription,ChildResource,MaintenanceWindow");
+    $data = callAPI( 'GET',"/urest/v1/resource_group/".$uuid."?fields=PolicySubscription,ChildResource,MaintenanceWindow", null);
     return $data;
 }
 

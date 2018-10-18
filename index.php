@@ -179,7 +179,7 @@ if (isset($_GET['uuid'])){
 
                     );
                     $payload = json_encode($mwPayload);
-                    $updateMW = callAPI('RGP','POST', $payload,"/urest/v1/resource_group/".$_POST['rguuid']."/maintenance_window");
+                    $updateMW = callAPI('POST', "/urest/v1/resource_group/".$_POST['rguuid']."/maintenance_window", $payload);
                     header("Location: index.php?view=ResourceGroup&uuid=".$_POST['rguuid']);
                     break;
             }

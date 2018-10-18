@@ -1,7 +1,7 @@
 # DCA-API-POC-App
 
 
-Populate the credentials in api.php
+Populate the credentials in config.php
 
 to obtain transport user/pass:
 

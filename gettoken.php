@@ -5,12 +5,9 @@
  * Date: 9/17/2018
  * Time: 4:25 PM
  */
-    $dcauser = ""; //DCA UI Username
-    $dcapw = ""; // DCA UI Password
-    $transportUser = ""; // transport user see next line
-    $transportPw = ""; // DCA transport user/pw, unique to each build see readme for how to obtain it
+    include "config.php";
 
-    $url = 'https://demo-mast.dca.demo.local:5443/idm-service/v2.0/tokens';
+    $url = "https://".$dcaFQDN.':5443/idm-service/v2.0/tokens';
     $ch = curl_init($url);
     $jsonData = array(
         'passwordCredentials' => array('username' => $dcauser, 'password' => $dcapw),
