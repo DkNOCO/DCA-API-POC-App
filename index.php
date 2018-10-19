@@ -87,20 +87,15 @@ if (isset($_GET['uuid'])){
 
                     if($resource['policysubscription']['count']>0){
                         foreach ($resource['policysubscription']['members'] as $member) {
-                            echo $member['policyName'] . " | <a href='index.php?view=AdhocJob&uuid=".$uuid . "&policyid=".$member['policyId']."'>Scan</a><br>";
+                            echo $member['policyName'] . " | <a href='index.php?view=AdhocJob&uuid=".$uuid . "&jobType=POLICY_SCAN&policyid=".$member['policyId']."'>Scan</a> | ";
+                            echo "<a href='index.php?view=AdhocJob&uuid=".$uuid . "&jobType=POLICY_REMEDIATE&policyid=".$member['policyId']."'>Remediate</a><br>";
                         }
                     }
 
                     break;
                 case "AdhocJob":
-                    // start job
-                    // redirect to jobs
-                    //this doesnt work.....
-                    $data = adhocScan($uuid,$_GET['policyid']);
-                    var_dump($data);
-                    die();
-
-
+                    $data = adhocScan($uuid,$_GET['policyid'],$_GET['jobType']);
+                    header("Location: index.php?view=ViewAllJobs");
                     break;
                 case "ViewAllJobs":
 
@@ -109,7 +104,7 @@ if (isset($_GET['uuid'])){
                     if ($data['count']>0){
                         foreach ($data['members'] as $member){
                             echo "<tr><td>".$member['jobName']."</td>" .
-                                "<td>".$member['jobRequest']['jobCreationStatus']."</td>".
+                                "<td>".$member['jobStatus']."</td>".
                                 "<td>".$member['jobStartTime']."</td>".
                                 "<td>".$member['jobEndTime']."</td>"
                             ;
@@ -125,13 +120,36 @@ if (isset($_GET['uuid'])){
 
                     $RGP = getResourceGroupDetails($uuid);
                     echo "<h2>".$RGP['name']."</h2><br>";
-
+                    $uuids = array();
                     if($RGP['childresource']['total']>=1){
                         echo "<h2>Resources:</h2>";
+                        echo "<table border=1><tr><td>Resource</td><td>";
+                        echo "Actions:</td></tr>";
                         foreach ($RGP['childresource']['members'] as $RM){
-                            echo $RM['name']."<br>";
+                            echo "<tr><td>";
+                            echo "<a href='index.php?view=Resource&uuid=".$RM['uuid']."'>".$RM['name']."</a></td><td>";
+                            if($RGP['policysubscription']['count']>0){
+                                foreach ($RGP['policysubscription']['members'] as $policy){
+                                    echo "<b>".$policy['policyName'] . "</b> | <a href='index.php?view=AdhocJob&uuid=".$RM['uuid'] . "&jobType=POLICY_SCAN&policyid=".$policy['policyId']."'>Scan</a> | ";
+                                    echo "<a href='index.php?view=AdhocJob&uuid=".$RM['uuid'] . "&jobType=POLICY_REMEDIATE&policyid=".$policy['policyId']."'>Remediate</a><br>";
+                                }
+                            }
+
+                            echo "</td>";
+                            $uuids[] = array("type" => "RESOURCE","uuid" => $RM['uuid']);
+                            echo "</tr>";
                         }
                     }
+                    echo "</table>";
+                    $uuids = json_encode($uuids);
+                    echo "<h3>Group Actions:</h3>";
+
+                if($RGP['policysubscription']['count']>0){
+                    foreach ($RGP['policysubscription']['members'] as $policy){
+                        echo "<b>".$policy['policyName'] . "</b> | <a href='index.php?view=AdhocJob&uuid=".$uuids . "&jobType=POLICY_SCAN&policyid=".$policy['policyId']."'>Scan</a> | ";
+                        echo "<a href='index.php?view=AdhocJob&uuid=".$uuids . "&jobType=POLICY_REMEDIATE&policyid=".$policy['policyId']."'>Remediate</a><br>";
+                    }
+                }
                     echo "<h3>Maintenance Windows:</h3>";
                     echo "<a href='index.php?view=AddMW&uuid=". $RGP['uuid']."'>Add window</a><br><br>";
                     if($RGP['maintenancewindow']['total']>=1){

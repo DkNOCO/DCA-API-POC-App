@@ -90,19 +90,29 @@ function getResource($uuid=null, $payload=null, $fields=null){
 
 }
 
-function adhocScan($uuid, $policyId){
+function adhocScan($uuid, $policyId, $jobType){
+    $uuidDecoded = json_decode($uuid);
+    if (json_last_error() === 0) {
+       $targets = $uuidDecoded;
+
+    }else
+    {
+        $targets = array(array(
+            "type" => "RESOURCE",
+            "uuid" => $uuid));
+    }
 
     $payload = array(
-      "type" => "COMPLIANCE_SCAN",
-        "target" => array(
-          "type" => "RESOURCE",
-          "uuid" => $uuid
-        ),
+        'jobType' => array(
+            "name" => $jobType),
+        "targets" => $targets,
         "properties" => array(array(
             "property" => "policyId",
-            "value" => $policyId
-        ))
+            "value" => $policyId)),
+        "schedule" => array(
+            "type" => "NOW")
     );
+
     $payload = json_encode($payload);
     $data = callAPI("POST", "/urest/v1/scheduler/job_request",$payload);
     return $data;
