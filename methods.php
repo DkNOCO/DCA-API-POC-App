@@ -10,8 +10,7 @@ include_once "config.php";
 
 function callAPI($method, $APIurl, $payload_JSON=null){
 
-    //ob_start(); // For debug
-    //$out = fopen('php://output', 'w'); // For debug
+
 
     if($method=="POST_RESOURCE"){
 
@@ -36,7 +35,8 @@ function callAPI($method, $APIurl, $payload_JSON=null){
         $_SESSION['DCATOKEN'] = file_get_contents('http://'.$_SERVER['SERVER_ADDR'].'/gettoken.php');
     }
 
-
+    //ob_start(); // For debug
+    //$out = fopen('php://output', 'w'); // For debug
     $tdDecoded = json_decode($_SESSION['DCATOKEN'], 1);
     $token = $tdDecoded['token']['id'];
     $refresh_token = $tdDecoded['refreshToken']; // not used
@@ -57,13 +57,25 @@ function callAPI($method, $APIurl, $payload_JSON=null){
             curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-Auth-Token:'.$token,'Content-Type: '.$contentType));
             curl_setopt($ch, CURLOPT_POSTFIELDS, $payload_JSON);
             break;
+        case "PATCH" :
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-Auth-Token:'.$token,'Content-Type: '.$contentType));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $payload_JSON);
+            break;
+        case "DELETE" :
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-Auth-Token:'.$token,'refresh-token:'.$refresh_token,'Content-Type: '.$contentType));
+
+            break;
     }
 
     $result = curl_exec($ch);
-    // fclose($out); // For debug
+     //fclose($out); // For debug
     // $debug = ob_get_clean(); // For debug
     //var_dump($debug); // For debug
     //die(); // For debug
+    //var_dump($result);
+    //die();
     $data = json_decode($result, true);
     return $data;
 }
@@ -159,6 +171,17 @@ function addResources($resources=array()){
     fwrite($handle, $data);
     fclose($handle);
     $data = callAPI("POST_RESOURCE","/urest/v1/resource",$csv_file);
+    return $data;
+}
+
+function addResourceToGroup($groupUuid, $resourceUuid){
+    $payload =  '{"jobName":"DCA_ASSOCIATE_TO_RG","targets":[{"uuid":"'.$resourceUuid.'","type":"RESOURCE","ciType":"host_node"}],"skiptargets":[],"filterQueryString":"","uuid":"'.$groupUuid.'"}';
+    $data = callAPI("PATCH","/urest/v1/resource_group/".$groupUuid."/resource", $payload);
+    return $data;
+}
+//Does not work.... feel free to troubleshoot....
+function deleteResource($uuid){
+    $data = callAPI("DELETE","/urest/v1/resource/".$uuid);
     return $data;
 }
 
