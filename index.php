@@ -10,6 +10,9 @@ include 'methods.php';
 if (isset($_GET['view'])){
     $showContent = $_GET['view'];
 }
+if (isset($_POST['view'])){
+    $showContent = $_POST['view'];
+}
 if (isset($_GET['uuid'])){
     $uuid = $_GET['uuid'];
 }
@@ -37,8 +40,9 @@ if (isset($_GET['uuid'])){
         <ul>
             <li><a href="index.php">Home</a><br></li>
             <li><b>Resources:</b></li>
-            <li><a href="index.php?view=AllResourceGroups">Resource Groups</a><br></li>
-            <li><a href="index.php?view=AllResources">Resources</a><br></li>
+            <li><a href="index.php?view=AllResourceGroups">List Resource Groups</a><br></li>
+            <li><a href="index.php?view=AllResources">List Resources</a><br></li>
+            <li><a href="index.php?view=AddResourcesForm">Add Resources</a><br></li>
             <li><b>Jobs:</b></li>
             <li><a href="index.php?view=ViewAllJobs">View All</a></li>
             <li>View Running</li>
@@ -91,6 +95,45 @@ if (isset($_GET['uuid'])){
                             echo "<a href='index.php?view=AdhocJob&uuid=".$uuid . "&jobType=POLICY_REMEDIATE&policyid=".$member['policyId']."'>Remediate</a><br>";
                         }
                     }
+
+                    break;
+                case "AddResources":
+                    // you could handle an array of resources from the form
+                    $resources = array(array(
+                        'type' => $_POST['type'],
+                        'name' => $_POST['name'],
+                        'host_servertype' => $_POST['host_servertype'],
+                        'os_family' => $_POST['os_family'],
+                        'extended_os_family' => $_POST['extended_os_family'],
+                        'display_label' => $_POST['display_label'],
+                        'os_description' => $_POST['os_description'],
+                        'credential_id' => $_POST['credential_id']
+                    ));
+
+                    addResources($resources);
+                    header("Location: index.php?view=AllResources");
+
+
+                    break;
+                case "AddResourcesForm":
+                    //you could use jquery to add more resource fields[] to allow for adding more than one resource at a time.
+                    echo "Add Resource<br>";
+                     echo "
+                     <form method='POST' action='index.php'>
+                     <input type='hidden' name='view' value='AddResources'>
+                     <label>Type:<select name='type'><option value='host_node'>host_node</option> </select></label>
+                     <label>Name:<input type='text' name='name'> </label> <br>
+                     <label>Host Server Type:<select name='host_servertype'><option value='MANAGED'>Managed</option></select></label>
+                     <label>OS Family:<select name='os_family'><option value='unix'>unix</option></select></label><br>
+                     <label>Extended OS Family:<select name='extended_os_family'><option value='LINUX'>LINUX</option></select></label>
+                     <label>Display Label:<input type='text' name='display_label'></label><br>
+                     <label>OS Description:<select name='os_description'><option value='Red Hat Enterprise Linux Server 7 X86_64' >RHEL 7 X86_64</option></select></label>
+                     <label>Credential (ID):<select name='credential_id'><option value='2c00f7d1-9b1f-4934-b231-a73fd2781a6a'>Lab Linux Credential</option></select></label><br><br>
+                     <input type='submit' value='Add'>
+                    </form>
+                     ";
+
+
 
                     break;
                 case "AdhocJob":
