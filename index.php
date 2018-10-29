@@ -128,7 +128,7 @@ if (isset($_GET['uuid'])){
                      <label>Extended OS Family:<select name='extended_os_family'><option value='LINUX'>LINUX</option></select></label>
                      <label>Display Label:<input type='text' name='display_label'></label><br>
                      <label>OS Description:<select name='os_description'><option value='Red Hat Enterprise Linux Server 7 X86_64' >RHEL 7 X86_64</option></select></label>
-                     <label>Credential (ID):<select name='credential_id'><option value='2c00f7d1-9b1f-4934-b231-a73fd2781a6a'>Lab Linux Credential</option></select></label><br><br>
+                     <label>Credential (ID):<input type='text' name='credential_id'></label><br><br>
                      <input type='submit' value='Add'>
                     </form>
                      ";

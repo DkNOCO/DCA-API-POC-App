@@ -1,5 +1,7 @@
 # DCA-API-POC-App
-
+** requires httpd, and php<=7 
+**PHP req based on use of curlfile object for uploading ressources. Other features work with older versions of PHP. It is possible to change the
+code to not use CurlFile class, and use @file instead.
 
 Populate the credentials in config.php
 use index.php to use the application UI
