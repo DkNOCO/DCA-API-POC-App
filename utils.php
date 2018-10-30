@@ -50,6 +50,7 @@ switch ($action){
             foreach (getResource() as $resource){
                 if ($resource['name']==$resourceFQDN){
                     $uuid = $resource['uuid'];
+                    header("Content-Type: text/plain");
                     echo $uuid;
                     break;
                 }

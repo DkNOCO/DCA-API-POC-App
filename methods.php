@@ -35,16 +35,16 @@ function callAPI($method, $APIurl, $payload_JSON=null){
         $_SESSION['DCATOKEN'] = file_get_contents('http://'.$_SERVER['SERVER_ADDR'].'/gettoken.php');
     }
 
-    //ob_start(); // For debug
-    //$out = fopen('php://output', 'w'); // For debug
+    ob_start(); // For debug
+    $out = fopen('php://output', 'w'); // For debug
     $tdDecoded = json_decode($_SESSION['DCATOKEN'], 1);
     $token = $tdDecoded['token']['id'];
     $refresh_token = $tdDecoded['refreshToken']; // not used
     $baseURL = "https://". $dcaFQDN;
     $url = $baseURL . $APIurl;
     $ch = curl_init($url);
-    //curl_setopt($ch, CURLOPT_VERBOSE, true); // for debug
-    //curl_setopt($ch, CURLOPT_STDERR, $out); // for Debug
+    curl_setopt($ch, CURLOPT_VERBOSE, true); // for debug
+    curl_setopt($ch, CURLOPT_STDERR, $out); // for Debug
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
@@ -70,10 +70,10 @@ function callAPI($method, $APIurl, $payload_JSON=null){
     }
 
     $result = curl_exec($ch);
-     //fclose($out); // For debug
-    // $debug = ob_get_clean(); // For debug
-    //var_dump($debug); // For debug
-    //die(); // For debug
+     fclose($out); // For debug
+     $debug = ob_get_clean(); // For debug
+    var_dump($debug); // For debug
+    die(); // For debug
     //var_dump($result);
     //die();
     $data = json_decode($result, true);
@@ -186,4 +186,3 @@ function deleteResource($uuid){
 }
 
 ?>
-
