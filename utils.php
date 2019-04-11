@@ -42,6 +42,7 @@ switch ($action){
                 'extended_os_family' => 'LINUX',
                 'display_label' => $resourceFQDN,
                 'os_description' => 'Red Hat Enterprise Linux Server 7 X86_64',
+                'description' => 'Centos',
                 'credential_id' => $credentialId
             ));
 
