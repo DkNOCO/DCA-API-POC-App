@@ -162,10 +162,10 @@ function addResources($resources=array()){
     $uuid = uniqid();
     $csv_file = 'csv/'. $uuid .'csv';
     $handle = fopen($csv_file, 'w') or die('Cannot open file:  '.$csv_file);
-    $data = 'type,name,host_servertype,os_family,extended_os_family,display_label,os_description,description,credential_id
+    $data = 'type,name,host_servertype,os_family,extended_os_family,display_label,os_description,credential_id
 ';
     foreach ($resources as $resource){
-        $data = $data. $resource['type'].','.$resource['name'].','.$resource['host_servertype'].','.$resource['os_family'].','.$resource['extended_os_family'].','.$resource['display_label'].','.$resource['os_description'].','. $resource['description'] .','.$resource['credential_id'].'
+        $data = $data. $resource['type'].','.$resource['name'].','.$resource['host_servertype'].','.$resource['os_family'].','.$resource['extended_os_family'].','.$resource['display_label'].','.$resource['os_description'].','.$resource['credential_id'].'
     ';
     }
     fwrite($handle, $data);
